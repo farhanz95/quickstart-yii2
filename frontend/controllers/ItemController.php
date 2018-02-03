@@ -117,6 +117,11 @@ class ItemController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionGetActiveItem(){
+
+        return $this->render(['item_active_list']);
+    }
+
     public function actionGetState(){
         $negara_id = Yii::$app->request->post('negara_id');
 

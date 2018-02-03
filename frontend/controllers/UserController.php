@@ -64,10 +64,24 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
+        $model = new \frontend\models\SignupForm;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+
+            $user = new \common\models\User();
+            $user->username = $model->username;
+            $user->email = $model->email;
+            $user->setPassword($model->password);
+            $user->generateAuthKey();
+
+            if ($user->save()) {
+                return $this->redirect(['view', 'id' => $user->id]);
+            }else{
+                echo "<pre>";
+                \yii\helpers\VarDumper::dump($user);
+                echo "</pre>";
+                die;
+            }
         }
 
         return $this->render('create', [
@@ -90,7 +104,7 @@ class UserController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('update', [
+        return $this->render('update_form', [
             'model' => $model,
         ]);
     }

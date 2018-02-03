@@ -36,9 +36,50 @@ $this->params['breadcrumbs'][] = $this->title;
             //'status',
             //'created_at',
             //'updated_at',
-
             [
-                'class' => 'yii\grid\ActionColumn'
+                'header' => 'Account Type',
+                'value' => function($model){
+                    if (isset(Yii::$app->authManager->getRolesByUser($model->id)['Admin'])) {
+                        return 'Admin';
+                    }else{
+                        return 'Normal User';
+                    }
+                },
+                'headerOptions' => ['style'=>'width:10%'],
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete}',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, [
+                                    'title' => Yii::t('app', 'lead-view'),
+                        ]);
+                    },
+
+                    'update' => function ($url, $model) {
+                        if (isset(Yii::$app->authManager->getRolesByUser($model->id)['Admin'])) {
+                            // Only Can Edit His Own
+                            if (Yii::$app->user->id == $model->id) {
+                                return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                                            'title' => Yii::t('app', 'lead-update'),
+                                ]);
+                            }
+                        }
+                    },
+                    'delete' => function ($url, $model) {
+                        if (isset(Yii::$app->authManager->getRolesByUser($model->id)['Admin'])) {
+                            return '';
+                        }else{
+                            if (Yii::$app->user->can('Admin')) {
+                                return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                                            'title' => Yii::t('app', 'lead-delete'),
+                                ]);
+                            }
+                        }
+                    }
+
+                ]
             ],
         ],
     ]); ?>

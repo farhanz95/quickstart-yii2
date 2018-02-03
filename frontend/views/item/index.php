@@ -17,7 +17,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
+        <?php if (Yii::$app->user->can('/user/create')): ?>
         <?= Html::a('Create Item', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php endif ?>
     </p>
 
     <?= GridView::widget([
@@ -55,7 +57,33 @@ $this->params['breadcrumbs'][] = $this->title;
             //'item_updated_on_system_date',
             //'item_activeness',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view} {update} {delete}',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', $url, [
+                                    'title' => Yii::t('app', 'lead-view'),
+                        ]);
+                    },
+
+                    'update' => function ($url, $model) {
+                        if (Yii::$app->user->can('/user/update')) {
+                            return Html::a('<span class="glyphicon glyphicon-pencil"></span>', $url, [
+                                        'title' => Yii::t('app', 'lead-update'),
+                            ]);
+                        }
+                    },
+                    'delete' => function ($url, $model) {
+                        if (Yii::$app->user->can('/user/delete')) {
+                            return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                                        'title' => Yii::t('app', 'lead-delete'),
+                            ]);
+                        }
+                    }
+
+                ]
+            ],
         ],
     ]); ?>
 </div>
