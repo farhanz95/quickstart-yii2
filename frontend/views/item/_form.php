@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
+use kartik\date\DatePicker;
 
 $masterCountry = ArrayHelper::map(\frontend\models\MasterNegara::find()->orderBy(['negara_nama'=>SORT_ASC])->asArray()->all(),'negara_id','negara_nama');
 
@@ -28,7 +29,13 @@ $masterCountry = ArrayHelper::map(\frontend\models\MasterNegara::find()->orderBy
 
         <?= $form->field($model, 'item_company_manufacturer')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'item_type')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'item_type')->dropDownList([
+            'Household'=>'Household',
+            'Apparatus'=>'Apparatus',
+            'Work Tools'=>'Work Tools',
+            'Hybrid'=>'Hybrid',
+            'Gadget'=>'Gadget',
+            ],['prompt'=>'-Select Item Type-']) ?>
 
         <?= $form->field($model, 'item_price')->textInput(['maxlength' => true]) ?>
           
@@ -66,7 +73,18 @@ $masterCountry = ArrayHelper::map(\frontend\models\MasterNegara::find()->orderBy
 
         <?= $form->field($model, 'item_manufactured_no_address')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'item_manufactured_date')->textInput() ?>
+
+        <?= '<label>Item Manufactured Date</label>' ?>
+
+        <?= DatePicker::widget([
+            'model' => $model,
+            'attribute' => 'item_manufactured_date',
+            'pluginOptions' => [
+              'format' => 'yyyy-mm-dd',
+              'todayHighlight' => true
+            ]
+        ]); ?> 
+
           
 
       </div>
@@ -78,13 +96,13 @@ $masterCountry = ArrayHelper::map(\frontend\models\MasterNegara::find()->orderBy
       </div>
       <div class="panel-body">
 
-        <?= $form->field($model, 'item_weight')->textInput() ?>
+        <?= $form->field($model, 'item_weight')->textInput()->label('Item Weight (KG)') ?>
 
-        <?= $form->field($model, 'item_size_height')->textInput() ?>
+        <?= $form->field($model, 'item_size_height')->textInput()->label('Item Height (CM)') ?>
 
-        <?= $form->field($model, 'item_size_width')->textInput() ?>
+        <?= $form->field($model, 'item_size_width')->textInput()->label('Item Width (CM)') ?>
 
-        <?= $form->field($model, 'item_size_length')->textInput() ?>
+        <?= $form->field($model, 'item_size_length')->textInput()->label('Item Length (CM)') ?>
           
 
       </div>
@@ -224,3 +242,45 @@ if($('select[name=\"Item[item_manufactured_state_address]\"] option:selected').v
 ");
 
 ?>
+
+
+<!-- Capture The Value In DropDownList -->
+<?php if (!$model->isNewRecord): ?>
+
+<?php 
+
+$this->registerJs("
+
+var selectedCountry = $('select[name=\"Item[item_manufactured_country_address]\"] option:selected').val();
+
+$('select[name=\"Item[item_manufactured_state_address]\"]').val(".$model->item_manufactured_state_address.");
+
+$('select[name=\"Item[item_manufactured_city_address]\"]').val(".$model->item_manufactured_city_address.");
+
+$.ajax({
+    type: 'post',
+    url: '".Yii::getAlias('@web')."/item/get-state',
+    data: 'negara_id='+selectedCountry,
+    success: function(data){
+        $('select[name=\"Item[item_manufactured_state_address]\"]').html(data);
+
+        $('select[name=\"Item[item_manufactured_state_address]\"]').val(".$model->item_manufactured_state_address.");
+    } 
+});
+
+$.ajax({
+    type: 'post',
+    url: '".Yii::getAlias('@web')."/item/get-city',
+    data: 'negeri_id='+".$model->item_manufactured_state_address.",
+    success: function(data){
+        $('select[name=\"Item[item_manufactured_city_address]\"]').html(data);
+
+        $('select[name=\"Item[item_manufactured_city_address]\"]').val(".$model->item_manufactured_city_address.");
+    } 
+});
+
+");
+
+?>    
+
+<?php endif ?>

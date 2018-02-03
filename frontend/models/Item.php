@@ -47,6 +47,12 @@ class Item extends \yii\db\ActiveRecord
         return 'item';
     }
 
+    public function afterFind(){
+        $this->item_manufactured_date = date_format(date_create($this->item_manufactured_date),'Y-m-d');
+        $this->item_availability_date_start = date_format(date_create($this->item_availability_date_start),'Y-m-d');
+        $this->item_availability_date_end = date_format(date_create($this->item_availability_date_end),'Y-m-d');
+    }
+
     /**
      * @inheritdoc
      */

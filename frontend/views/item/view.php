@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Item */
 
-$this->title = $model->item_id;
+$this->title = $model->item_name;
 $this->params['breadcrumbs'][] = ['label' => 'Items', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -28,31 +28,108 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'item_id',
+            // 'item_id',
             'item_name',
             'item_product_id',
             'item_type',
             'item_quantity',
-            'item_price',
+            [
+                'attribute' => 'item_price',
+                'value' => function($model){
+                    return 'RM '.$model->item_price;
+                }
+            ],
             'item_brand',
             'item_model',
             'item_company_manufacturer',
-            'item_manufactured_country_address',
-            'item_manufactured_state_address',
-            'item_manufactured_city_address',
+            [   
+                'label'=>'Country',
+                'attribute'=>'item_manufactured_country_address',
+                'value' => function($model){
+                    if ($model->item_manufactured_country_address) {
+                        return ucfirst(strtolower($model->itemManufacturedCountryAddress->negara_nama));
+                    }
+                }
+            ],
+            [   
+                'label'=>'State',
+                'attribute'=>'item_manufactured_state_address',
+                'value' => function($model){
+                    if ($model->item_manufactured_state_address) {
+                        return $model->itemManufacturedStateAddress->negeri_nama;
+                    }
+                }
+            ],
+            [   
+                'label'=>'City',
+                'attribute'=>'item_manufactured_city_address',
+                'value' => function($model){
+                    if ($model->item_manufactured_city_address) {
+                        return $model->itemManufacturedCityAddress->daerah_nama;
+                    }
+                }
+            ],
             'item_manufactured_postcode_address',
             'item_manufactured_street_address',
             'item_manufactured_no_address',
-            'item_weight',
-            'item_size_height',
-            'item_size_width',
-            'item_size_length',
-            'item_manufactured_date',
-            'item_availability_date_start',
-            'item_availability_date_end',
+            [
+                'attribute' => 'item_weight',
+                'label' => 'Item Weight (KG)',
+                'value' => function($model){
+                    return $model->item_weight;
+                }
+            ],
+            [
+                'attribute' => 'item_size_height',
+                'label' => 'Item Height (CM)',
+                'value' => function($model){
+                    return $model->item_weight;
+                }
+            ],
+            [
+                'attribute' => 'item_size_width',
+                'label' => 'Item Size Width (CM)',
+                'value' => function($model){
+                    return $model->item_weight;
+                }
+            ],
+            [
+                'attribute' => 'item_size_length',
+                'label' => 'Item Size Length (CM)',
+                'value' => function($model){
+                    return $model->item_weight;
+                }
+            ],
+            [
+                'attribute' => 'item_manufactured_date',
+                'value' => function($model){
+                    return date_format(date_create($model->item_manufactured_date),'Y-m-d');
+                }
+            ],
+            [
+                'attribute' => 'item_availability_date_start',
+                'value' => function($model){
+                    return date_format(date_create($model->item_availability_date_start),'Y-m-d');
+                }
+            ],
+            [
+                'attribute' => 'item_availability_date_end',
+                'value' => function($model){
+                    return date_format(date_create($model->item_availability_date_end),'Y-m-d');
+                }
+            ],
             'item_registered_on_system_date',
             'item_updated_on_system_date',
-            'item_activeness',
+            [
+                'attribute' => 'item_activeness',
+                'value' => function($model){
+                    if ($model->item_activeness) {
+                        return 'Active';
+                    }else{
+                        return 'Not Active';
+                    }
+                }
+            ],
         ],
     ]) ?>
 
